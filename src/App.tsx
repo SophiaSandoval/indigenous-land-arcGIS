@@ -17,14 +17,30 @@ function App() {
 
   return (
     <div className="">
-      <div className="">Hello World</div>
+      <div
+        style={{
+          background: "red",
+          border: "2px",
+          width: "100%",
+          height: "100%",
+          right: 0,
+          position: "fixed",
+          textAlign: "center",
+          fontSize: "25px",
+          fontFamily: "Avenir Next",
+          fontWeight: "400",
+        }}
+      >
+        Indigenous Land Locator - arcGIS
+      </div>
       <div
         style={{
           height: 800,
           width: "100%",
           position: "fixed",
           left: 0,
-          top: 0,
+          top: 35,
+          bottom: 0,
         }}
         ref={mapViewRef}
       ></div>

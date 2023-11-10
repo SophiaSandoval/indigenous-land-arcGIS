@@ -7,8 +7,14 @@ import axios from "axios";
 import { vectorBasemapLayer } from "esri-leaflet-vector";
 import * as L from "leaflet";
 
-let tooltip: L.Marker<any> | null = null;
-let polygon: L.Polygon | null = null;
+const polygons: L.Polygon[] = [];
+let properties: Property[] = [];
+
+interface Property {
+  name: string;
+  color: string;
+  geometry: any[];
+}
 
 export const init = (mapView: HTMLDivElement) => {
   const map = L.map(mapView, {
@@ -23,21 +29,57 @@ export const init = (mapView: HTMLDivElement) => {
     const res = await axios.get(
       `https://native-land.ca/wp-json/nativeland/v1/api/index.php?maps=languages&position=${lat},${lng}`
     );
-    console.log(res.data[0].properties.Name);
+    properties = [];
+    console.log(res.data);
 
-    tooltip?.remove();
-    tooltip = L.marker([lat, lng]);
-    tooltip.addTo(map).bindPopup(res.data[0].properties.Name).openPopup();
-
-    const coords = res.data[0].geometry.coordinates[0].map((data: any) => {
-      return new L.LatLng(data[1], data[0]);
+    polygons.forEach((p) => {
+      p.remove();
     });
 
-    polygon?.remove();
-    polygon = L.polygon(coords, {
-      color: "red",
+    res.data.forEach((territory: any) => {
+      const property: Property = {
+        name: territory.properties.Name,
+        color: territory.properties.color,
+        geometry: territory.geometry.coordinates[0],
+      };
+
+      properties.push(property);
+
+      const coords = property.geometry.map((data: any) => {
+        return new L.LatLng(data[1], data[0]);
+      });
+
+      console.log(coords);
+
+      const polygon = L.polygon(coords, {
+        color: property.color,
+      });
+
+      polygons.push(polygon);
+
+      polygon.addTo(map);
     });
-    polygon.addTo(map);
+
+    let htmlElement = "<div>";
+
+    properties.forEach((p) => {
+      htmlElement += `
+            <p>
+                <span style="display: inline-block; width: 10px; height: 10px; background-color: ${p.color}; margin-right: 5px;"></span>
+                ${p.name}
+            </p>
+        `;
+    });
+
+    htmlElement += "</div>";
+    // tooltip?.remove();
+    // tooltip = L.marker([lat, lng]);
+    const popup = L.popup()
+      .setLatLng([lat, lng])
+      .setContent(htmlElement)
+      .openOn(map)
+      .openPopup();
+    // tooltip.addTo(map).bindPopup(names).openPopup();
   });
 
   return map;
