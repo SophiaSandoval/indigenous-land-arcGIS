@@ -1,4 +1,3 @@
-
 module.exports = {
   env: { browser: true, es2020: true },
   extends: [
@@ -13,4 +12,7 @@ module.exports = {
     'react-refresh/only-export-components': 'warn',
     "@typescript-eslint/no-explicit-any": "off"
   },
+  ignorePatterns: [
+    'ios/*'  // Pattern to ignore everything in the root-level ios folder
+  ]
 }
