@@ -3,9 +3,11 @@ const apiKey =
 
 const basemapEnum = "ArcGIS:Imagery";
 
-import axios from "axios";
+import { CapacitorHttp } from "@capacitor/core";
 import { vectorBasemapLayer } from "esri-leaflet-vector";
 import * as L from "leaflet";
+
+console.log("Hello World");
 
 const polygons: L.Polygon[] = [];
 let properties: Property[] = [];
@@ -25,12 +27,15 @@ export const init = (mapView: HTMLDivElement) => {
 
   map.on("click", async (event) => {
     const { lat, lng } = event.latlng;
-    console.log(lat, lng);
-    const res = await axios.get(
-      `https://native-land.ca/wp-json/nativeland/v1/api/index.php?maps=languages&position=${lat},${lng}`
-    );
+    const response = await CapacitorHttp.get({
+      url: `https://native-land.ca/wp-json/nativeland/v1/api/index.php?maps=languages&position=${lat},${lng}`,
+    });
+    console.log(response.status);
+
+    const res = { data: await response.data };
+    console.log(typeof res.data);
+
     properties = [];
-    console.log(res.data);
 
     polygons.forEach((p) => {
       p.remove();
@@ -72,14 +77,12 @@ export const init = (mapView: HTMLDivElement) => {
     });
 
     htmlElement += "</div>";
-    // tooltip?.remove();
-    // tooltip = L.marker([lat, lng]);
-    const popup = L.popup()
+
+    L.popup()
       .setLatLng([lat, lng])
       .setContent(htmlElement)
       .openOn(map)
       .openPopup();
-    // tooltip.addTo(map).bindPopup(names).openPopup();
   });
 
   return map;

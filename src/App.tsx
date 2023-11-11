@@ -31,7 +31,7 @@ function App() {
           fontWeight: "400",
         }}
       >
-        Indigenous Land Locator - arcGIS
+        Hello world
       </div>
       <div
         style={{
